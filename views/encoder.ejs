@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+    <title>Agent Performance Data Encoder</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --warning-color: #f39c12;
+            --background-color: #f4f7fa;
+            --card-background: #ffffff;
+            --text-color: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .form-group input, 
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .buttons {
+            display: flex;
+            <!-- justify-content: space-between; -->
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d35400;
+        }
+
+        #encoded-output {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .agent-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .agent-card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .agent-card img {
+            max-width: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .form-section {
+                grid-template-columns: 1fr;
+            }
+        }
+		
+		 /* Rest of the previous CSS remains the same */
+        .encode-btn {
+            position: fixed;
+			position: fixed;
+			top: 2rem;
+			left: 2em;
+			background-color: var(--accent-blue);
+			border: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: 50px;
+			cursor: pointer;
+			font-weight: 600;
+			box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+			transition: all 0.3sease;
+        }
+
+        .encode-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+		
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly darker background */
+            display: flex; /* Use flexbox for centering */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            padding: 30px;
+            border-radius: 10px;
+            <!-- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add subtle shadow */ -->
+            text-align: center;
+            width: 300px; /* Define a fixed width */
+        }
+
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+		
+		.avatar-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 19.5rem;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Agent Performance Data Encoder</h1>
+        
+        <div class="section-header">
+            <h2>Global Target Ratio</h2>
+        </div>
+        <div class="form-section">
+            <div class="form-group">
+                <label for="global-target-ratio">Global Target Ratio</label>
+                <input type="number" id="global-target-ratio" min="1" step="0.1">
+            </div>
+            <div class="buttons">
+                <button class="btn btn-primary" id="update-ratio">Set Global Target Ratio</button>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>Agent Names and Avatars</h2>
+        </div>
+        <div class="form-section">
+            <div class="form-group">
+                <label for="agent-name">Agent Name</label>
+                <select id="agent-name">
+                    <!-- <option value="Agent 1">Agent 1</option> -->
+                    <!-- <option value="Agent 2">Agent 2</option> -->
+                    <!-- <option value="Agent 3">Agent 3</option> -->
+                    <!-- <option value="Agent 4">Agent 4</option> -->
+                    <!-- <option value="Agent 5">Agent 5</option> -->
+                    <!-- <option value="Agent 6">Agent 6</option> -->
+                    <!-- <option value="Agent 7">Agent 7</option> -->
+                    <!-- <option value="Agent 8">Agent 8</option> -->
+                    <!-- <option value="Agent 9">Agent 9</option> -->
+                    <!-- <option value="Agent 10">Agent 10</option> -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="agent-avatar">Agent Avatar URL</label>
+                <input type="text" id="agent-avatar" placeholder="https://example.com/avatar.jpg">
+            </div>
+            <div class="buttons" style="float: right;">
+                <!-- <button class="btn btn-primary" onclick="addAgentName()">Add Agent Name</button> -->
+                <button class="btn btn-warning" id="update-leader">Update Agent</button>
+            </div>
+			<a href="/avatar"><button class="avatar-btn" style="color: black"><button class="btn btn-primary" id="update-leader">Click to get avatar link</button></a>
+        </div>
+
+        <div class="section-header">
+            <h2>Sales and Expenses</h2>
+        </div>
+        <div class="form-section">
+            <div class="form-group">
+                <label for="available-agents">Available Agents</label>
+                <select id="available-agents" disabled>
+					 <option></option>
+					 <option></option>
+				</select>
+            </div>
+            <div class="form-group">
+                <label for="sales">Sales (₱)</label>
+                <input type="number" id="sales" placeholder="Total Sales">
+            </div>
+            <div class="form-group">
+                <label for="sales-date">Sales Date</label>
+                <input type="date" id="sales-date">
+            </div>
+            <div class="form-group">
+                <label for="expenses">Expenses (₱)</label>
+                <input type="number" id="expenses" placeholder="Total Expenses">
+            </div>
+            <div class="form-group">
+                <label for="expenses-date">Expenses Date</label>
+                <input type="date" id="expenses-date">
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" id="add-agent">Add Agent Performance</button>
+                <button class="btn btn-warning" id="update-agent">Update Performance</button>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>Agents</h2>
+        </div>
+        <div id="agent-preview" class="agent-preview"></div>
+
+        <div class="section-header">
+            <h2>Encoded Data</h2>
+        </div>
+        <div id="encoded-output">
+			<table id="example" class="display" width="100%">
+				<thead>
+				<tr>
+				  <th>Metric Id</th>
+				  <th>Leader Id</th>
+				  <th>Name</th>
+				  <th>Sales</th>
+				  <th>Sales date</th>
+				  <th>Expense</th>
+				  <th>Expense date</th>
+				</tr>
+			  </thead>
+			  <tbody></tbody>
+			</table>
+		</div>
+    </div>
+	 <a href="/"><button class="encode-btn"><i class="fa fa-arrow-left"></i></button></a>
+    <script src="/js/encoder.js"></script>
+</body>
+</html>
+
+<div id="successModal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+  <div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 5px;">
+    <span id="closeSuccess" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    <h2 id="successTitle">Success!</h2>
+    <p id="successMessage">Your operation was successful.</p>
+  </div>
+</div>
+
+<div id="errorModal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+  <div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 5px;">
+    <span id="closeError" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    <h2 id="errorTitle" style="color: red">Error!</h2>
+    <p id="errorMessage">Your operation was successful.</p>
+  </div>
+</div>
+
+<div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="loader"></div>
+            <!-- <p>Please wait...</p> -->
+        </div>
+    </div>

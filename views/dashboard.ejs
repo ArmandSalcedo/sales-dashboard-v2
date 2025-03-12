@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Performance Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<style>
+ :root {
+            --bg-primary: #f4f7fa;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #34495e;
+            --border-color: #e0e6ed;
+            --accent-blue: #3498db;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --accent-purple: #8e44ad;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .time-range-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .time-range-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-range-btn.active {
+            background-color: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .custom-date-container {
+            display: none;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .custom-date-container.visible {
+            display: flex;
+        }
+
+        .custom-date-input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .summary-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+			text-align: center;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-card h3 {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .agent-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border-top: 4px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .agent-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            object-fit: cover;
+            border: 3px solid var(--border-color);
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .agent-card.high-performer {
+            border-top-color: var(--accent-green);
+        }
+
+        .agent-card.low-performer {
+            border-top-color: var(--accent-red);
+        }
+
+        .ranking-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .ranking-badge.rank-1 { background-color: #FFD700; }
+        .ranking-badge.rank-2 { background-color: #C0C0C0; }
+        .ranking-badge.rank-3 { background-color: #CD7F32; }
+        .ranking-badge.rank-4 { background-color: #4169E1; }
+        .ranking-badge.rank-5 { background-color: #A9A9A9; }
+        .ranking-badge.rank-6 { background-color: #778899; }
+        .ranking-badge.rank-7 { background-color: #708090; }
+        .ranking-badge.rank-8 { background-color: #696969; }
+        .ranking-badge.rank-9 { background-color: #808080; }
+        .ranking-badge.rank-10 { background-color: #A0522D; }
+
+        .agent-card h3 {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .performance-indicator {
+            text-align: center;
+            font-weight: 700;
+            padding: 0.5rem;
+            border-radius: 6px;
+            width: 100%;
+        }
+
+        .performance-indicator.positive {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--accent-green);
+        }
+
+        .performance-indicator.negative {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--accent-red);
+        }
+
+        /* Rest of the previous CSS remains the same */
+        .refresh-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 6.5rem;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+		
+		 /* Rest of the previous CSS remains the same */
+        .encode-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 13rem;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .encode-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+		
+		.avatar-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 19.5rem;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+
+        #card-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-screen-content {
+            background-color: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .close-card-screen {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1200px) {
+            .summary-grid,
+            .agent-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid,
+            .agent-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Rest of the previous CSS remains the same as in the original file */
+        /* ... (previous CSS styles) ... */
+</style>
+<body>
+    <div id="dashboard" class="dashboard-container">
+        <div class="time-range-selector">
+            <button id="btnDaily" class="time-range-btn" data-range="daily">Daily</button>
+            <button id="btnWeekly" class="time-range-btn active" data-range="weekly">Weekly</button>
+            <button id="btnMonthly" class="time-range-btn" data-range="monthly">Monthly</button>
+            <button id="btnCustom" class="time-range-btn" data-range="custom">Custom</button>
+            
+            <div id="custom-date-container" class="custom-date-container">
+                <label for="start-date">From:</label>
+                <input type="date" id="start-date" class="custom-date-input">
+                <label for="end-date">To:</label>
+                <input type="date" id="end-date" class="custom-date-input">
+                <button id="apply-custom-date" class="time-range-btn">Apply</button>
+            </div>
+        </div>
+
+        <div id="summary-cards" class="summary-grid">
+            <!-- Summary cards will be populated by JavaScript -->
+        </div>
+        <div id="agent-cards" class="agent-grid">
+            <!-- Agent performance cards will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <div id="card-screen">
+        <button class="close-card-screen">&times;</button>
+        <div class="card-screen-content">
+            <div id="card-screen-details"></div>
+        </div>
+    </div>
+	
+	 <a href="/encoder"><button class="encode-btn">Encoder</button></a>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
