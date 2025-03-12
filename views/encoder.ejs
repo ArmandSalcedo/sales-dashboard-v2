@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 	<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-	<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+
     <title>Leader Performance Data Encoder</title>
     <style>
         :root {
@@ -118,9 +124,9 @@
             background-color: white;
             padding: 20px;
             border-radius: 5px;
-            max-height: 400px;
+            /* max-height: 400px; */
             overflow-y: auto;
-            white-space: pre-wrap;
+            /* white-space: pre-wrap; */
             word-break: break-all;
         }
 
@@ -217,30 +223,105 @@
             100% { transform: rotate(360deg); }
         }
 		
-		.avatar-btn {
-            position: fixed;
-            bottom: 2rem;
-            right: 19.5rem;
-            background-color: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
-            transition: all 0.3s ease;
+        .jumbotron {
+            border-radius: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 1em;
         }
 
-        .avatar-btn:hover {
-            background-color: #2980b9;
-            transform: translateY(-3px);
+        div.dataTables_wrapper {
+            padding-left: 0;
+            padding-right: 0;
         }
+
+        div.dataTables_wrapper div.dataTables_paginate {
+            margin-top: 10px;
+        }
+
+        .pagination {
+            font-size: .85em;
+        }
+
+        table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before, table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before {
+            background-color: #007bff;
+            border-radius: 0;
+            border: none;
+            top: 13px;
+        }
+
+        table.dataTable > tbody > tr.child span.dtr-title {
+            display: block;
+        }
+
+        table.dataTable.dtr-inline.collapsed > tbody > tr > td.child, table.dataTable.dtr-inline.collapsed > tbody > tr > th.child, table.dataTable.dtr-inline.collapsed > tbody > tr > td.dataTables_empty {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        table.dataTable.dtr-inline.collapsed > tbody > tr > td.child > table {
+            width: 100%;
+        }
+
+        .table {
+            border: 1px solid rgba(0, 0, 0, .12);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+        }
+        .table thead th {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            font-weight: 500;
+            color: #555454;
+        }
+        .table tbody tr {
+            -webkit-transition: all 0.2s ease;
+            transition: all 0.2s ease-in-out;
+        }
+        .table tbody tr td {
+            font-size: 0.9em;
+            color: #5d5d5e;
+        }
+        .table tbody tr.selected {
+            box-shadow: 0px 0px 15px 1px rgba(35, 35, 35, .5);
+            background-color: #8e8c8c;
+        }
+        .table tbody tr.selected td {
+            color: #fff;
+            border-top: none;
+        }
+        .table tbody tr.child td.child {
+            padding-left: 10px !important;
+            padding-right: 10px;
+        }
+
+        .selected {
+            background-color: #3498db;
+            color: white !important;
+        }
+
+        #agentInput {
+            display: none;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #exitIcon {
+            /* position: absolute;
+            top: 5px;
+            right: 5px; */
+            cursor: pointer;
+            display: none; /* Initially hidden */
+        }
+
+        .modal-content {
+            background-color: rgba(0,0,0,0.0) !important; 
+            border: none !important; 
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Leader Performance Data Encoder</h1>
+        <h1>Agent Performance Data Encoder</h1>
         
         <div class="section-header">
             <h2>Global Target Ratio</h2>
@@ -261,25 +342,17 @@
         <div class="form-section">
             <div class="form-group">
                 <label for="agent-name">Leader Name</label>
+                <span id="exitIcon">&#x2716;</span>
                 <select id="agent-name">
-                    <!-- <option value="Agent 1">Agent 1</option> -->
-                    <!-- <option value="Agent 2">Agent 2</option> -->
-                    <!-- <option value="Agent 3">Agent 3</option> -->
-                    <!-- <option value="Agent 4">Agent 4</option> -->
-                    <!-- <option value="Agent 5">Agent 5</option> -->
-                    <!-- <option value="Agent 6">Agent 6</option> -->
-                    <!-- <option value="Agent 7">Agent 7</option> -->
-                    <!-- <option value="Agent 8">Agent 8</option> -->
-                    <!-- <option value="Agent 9">Agent 9</option> -->
-                    <!-- <option value="Agent 10">Agent 10</option> -->
                 </select>
+                <input type="text" id="agentInput">
             </div>
             <div class="form-group">
                 <label for="agent-avatar">Leader Avatar URL</label>
                 <input type="text" id="agent-avatar" placeholder="https://example.com/avatar.jpg">
             </div>
             <div class="buttons" style="float: right;">
-                <!-- <button class="btn btn-primary" onclick="addAgentName()">Add Agent Name</button> -->
+                <button class="btn btn-primary" id="add-leader">Add Leader Name</button>
                 <button class="btn btn-warning" id="update-leader">Update Leader</button>
             </div>
 			<a href="/avatar"><button class="avatar-btn" style="color: black"><button class="btn btn-primary" id="update-leader">Click to get avatar link</button></a>
@@ -325,20 +398,22 @@
             <h2>Encoded Data</h2>
         </div>
         <div id="encoded-output">
-			<table id="example" class="display" width="100%">
-				<thead>
-				<tr>
-				  <th>Metric Id</th>
-				  <th>Leader Id</th>
-				  <th>Name</th>
-				  <th>Sales</th>
-				  <th>Sales date</th>
-				  <th>Expense</th>
-				  <th>Expense date</th>
-				</tr>
-			  </thead>
-			  <tbody></tbody>
-			</table>
+            <div class="jumbotron tab-pane fade show active">
+                <table id="example" class="table table-striped" width="100%">
+                    <thead>
+                    <tr>
+                      <th>Metric Id</th>
+                      <th>Leader Id</th>
+                      <th>Name</th>
+                      <th>Sales</th>
+                      <th>Sales date</th>
+                      <th>Expense</th>
+                      <th>Expense date</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+            </div>
 		</div>
     </div>
 	 <a href="/"><button class="encode-btn"><i class="fa fa-arrow-left"></i></button></a>

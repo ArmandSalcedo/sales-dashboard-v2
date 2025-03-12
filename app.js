@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const fetch = require('node-fetch');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3343;
 
 // Set view engine to EJS
 app.set('view engine', 'ejs');
@@ -279,6 +279,51 @@ app.get('/api/update_metrics', async (req, res) => {
     } catch (error) {
         console.error('Error updating metric data:', error);
         res.status(500).json({ error: 'Failed to update metric data' });
+    }
+});
+
+app.get('/api/add_leader', async (req, res) => {
+    try {
+        const key = '49eaf9ad843c3984adea0117f4b34231';
+		const leaderName = req.query.leaderName; 
+		const avatar = req.query.avatar; 
+		
+		console.log(leaderName);
+		console.log(avatar);
+
+        const md5Hash = MD5(leaderName + '&' + avatar + '&' + key);
+		console.log(md5Hash);
+		var jsonResp = '';
+	
+
+        const apiurl = 'https://atcsolution.link/SalesMetricsApi/leader/add?leaderName=' + leaderName + '&avatar=' + avatar + '&signKey=' + md5Hash; // URL without query parameters
+
+        const response = await fetch(apiurl, {
+            method: 'POST', // Change method to POST
+            headers: {
+                'Authorization': 'Basic ' + btoa('SalesMetricsApi:pass@123'),
+                'Content-Type': 'application/json' // Important for sending JSON
+            }
+            // body: JSON.stringify({ // Send targetRatio and signKey in the request body
+			// 	leaderId: leaderId,
+			// 	sales: sales,
+			// 	salesDate: salesDate,
+			// 	expense: expense,
+			// 	expenseDate: expenseDate,
+            //     signKey: md5Hash
+            // })
+        }).then((response) => response.json())
+			.then((data) => {
+				jsonResp = data;
+				console.log(data);
+		});
+		
+		console.log('response ' + jsonResp.data);
+		res.json(jsonResp);
+		
+    } catch (error) {
+        console.error('Error adding agent data:', error);
+        res.status(500).json({ error: 'Failed to add agent data' });
     }
 });
 

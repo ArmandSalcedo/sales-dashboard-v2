@@ -154,6 +154,29 @@ async function AddAgent(leaderId, sales, salesDate, expense, expenseDate) {
 	});
 }
 
+async function AddLeader(leaderName, avatar) {
+    try {
+        let url = `/api/add_leader?leaderName=${leaderName}&avatar=${avatar}`;
+        
+        const response = await fetch(url);
+        
+		// var targetRatio = document.getElementById('global-target-ratio');
+		// targetRatio.value = targetRatio;
+		showSuccessModal('Success','Agent added successfully!')
+        
+        return await response.json();
+    } catch (error) {
+        showErrorModal('Error fetching agent data', error);
+        return [];
+    }
+	
+	return new Promise(resolve => {
+                setTimeout(() => {
+			resolve(); // Resolve the promise after 2 seconds
+		}, 2000); // Simulate a 2-second delay
+	});
+}
+
 async function UpdateTargetMetrics(metricsId, leaderId, sales, salesDate, expense, expenseDate) {
     try {
         let url = `/api/update_metrics?metricsId=${metricsId}&leaderId=${leaderId}&sales=${sales}&salesDate=${salesDate}&expense=${expense}&expenseDate=${expenseDate}`;
@@ -215,11 +238,13 @@ async function initializeEncoder() {
 	const updateRatio = document.getElementById('update-ratio');
 	const updateMetrics = document.getElementById('update-agent');
 	const addAgent = document.getElementById('add-agent');
-	const leaderList = document.getElementById('agent-name');
 	const sales = document.getElementById('sales');
 	const salesDate = document.getElementById("sales-date");
 	const expense = document.getElementById('expenses');
 	const expenseDate = document.getElementById('expenses-date');
+	const addLeader = document.getElementById('add-leader');
+	const agentInput = document.getElementById('agentInput');
+	const exitIcon = document.getElementById('exitIcon');
 	var availableAgents = document.getElementById("available-agents");
 	var updateLeader = document.getElementById('update-leader');
 	var leader = document.getElementById('agent-name');
@@ -227,6 +252,24 @@ async function initializeEncoder() {
 	var leaderName = '';	 
 	var targetRatio = document.getElementById('global-target-ratio');
 	targetRatio.value = target[0].target_ratio;
+
+	addLeader.addEventListener('click', function() {
+		leader.style.display = 'none';
+		agentInput.style.display = 'inline-block';
+		exitIcon.style.display = 'inline-block';
+		agentInput.focus();
+
+		if (agentInput.value != '') {
+			AddLeader(agentInput.value, avatar.value)
+		}
+
+	});
+
+	exitIcon.addEventListener('click', function() {
+		agentInput.style.display = 'none';
+		exitIcon.style.display = 'none';
+		leader.style.display = 'inline-block';
+	});
 	
 	updateLeader.addEventListener('click', function() {
 		if (leader.value == '') {
@@ -309,14 +352,42 @@ async function initializeEncoder() {
 	];
 
 	populateDataTable(metrics, 'example', columns, {
-	  paging: false,
-	  ordering: false,
-	  info: false
+	//   paging: false,
+	//   info: false
+	lengthChange: false,
+	pagingType: 'simple_numbers',
+	paging: true,
+	ordering: false,
+	responsive: {
+			details: {
+				renderer: function (api, rowIdx, columns) {
+					var data = $.map(columns, function (col, i) {
+						return col.hidden ?
+							'<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
+							'<td>' + col.title + ':' + '</td> ' +
+							'<td>' + col.data + '</td>' +
+							'</tr>' :
+							'';
+					}).join('');
+	
+					return data ?
+						$('<table/>').append(data) :
+						false;
+				}
+			}
+		},
 	});
+
+	let j = 0;
+
+	while (j < leaders.length) {
+		leader.add(new Option(leaders[j].leader_name, leaders[j].leader_id));
+		j++;
+	}	 
 
 	for(var y = 0; y <= leaders.length; y++) {
 		availableAgents.add(new Option(leaders[y].leader_name, leaders[y].leader_id));
-	}	
+	}		
 }
 
 window.addEventListener('DOMContentLoaded', () => {
