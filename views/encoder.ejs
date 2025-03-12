@@ -7,7 +7,7 @@
 	<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-    <title>Agent Performance Data Encoder</title>
+    <title>Leader Performance Data Encoder</title>
     <style>
         :root {
             --primary-color: #3498db;
@@ -74,7 +74,6 @@
 
         .buttons {
             display: flex;
-            <!-- justify-content: space-between; -->
             margin-bottom: 20px;
         }
 
@@ -199,7 +198,6 @@
         .modal-content {
             padding: 30px;
             border-radius: 10px;
-            <!-- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add subtle shadow */ -->
             text-align: center;
             width: 300px; /* Define a fixed width */
         }
@@ -242,7 +240,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Agent Performance Data Encoder</h1>
+        <h1>Leader Performance Data Encoder</h1>
         
         <div class="section-header">
             <h2>Global Target Ratio</h2>
@@ -258,11 +256,11 @@
         </div>
 
         <div class="section-header">
-            <h2>Agent Names and Avatars</h2>
+            <h2>Leader Names and Avatars</h2>
         </div>
         <div class="form-section">
             <div class="form-group">
-                <label for="agent-name">Agent Name</label>
+                <label for="agent-name">Leader Name</label>
                 <select id="agent-name">
                     <!-- <option value="Agent 1">Agent 1</option> -->
                     <!-- <option value="Agent 2">Agent 2</option> -->
@@ -277,12 +275,12 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="agent-avatar">Agent Avatar URL</label>
+                <label for="agent-avatar">Leader Avatar URL</label>
                 <input type="text" id="agent-avatar" placeholder="https://example.com/avatar.jpg">
             </div>
             <div class="buttons" style="float: right;">
                 <!-- <button class="btn btn-primary" onclick="addAgentName()">Add Agent Name</button> -->
-                <button class="btn btn-warning" id="update-leader">Update Agent</button>
+                <button class="btn btn-warning" id="update-leader">Update Leader</button>
             </div>
 			<a href="/avatar"><button class="avatar-btn" style="color: black"><button class="btn btn-primary" id="update-leader">Click to get avatar link</button></a>
         </div>
@@ -292,10 +290,8 @@
         </div>
         <div class="form-section">
             <div class="form-group">
-                <label for="available-agents">Available Agents</label>
-                <select id="available-agents" disabled>
-					 <option></option>
-					 <option></option>
+                <label for="available-agents">Available Leaders</label>
+                <select id="available-agents">
 				</select>
             </div>
             <div class="form-group">
@@ -315,13 +311,13 @@
                 <input type="date" id="expenses-date">
             </div>
             <div class="buttons">
-                <button class="btn btn-secondary" id="add-agent">Add Agent Performance</button>
+                <button class="btn btn-secondary" id="add-agent">Add Leader Performance</button>
                 <button class="btn btn-warning" id="update-agent">Update Performance</button>
             </div>
         </div>
 
         <div class="section-header">
-            <h2>Agents</h2>
+            <h2>Leaders</h2>
         </div>
         <div id="agent-preview" class="agent-preview"></div>
 

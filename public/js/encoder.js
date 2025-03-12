@@ -109,7 +109,7 @@ async function GetMetrics(metricId) {
         const metricsDetails = await response.json();
 		
 		let i = 0;
-		
+
 		while (i < metricsDetails.length) {
 			sales.value = metricsDetails[i].sales;
 			expense.value = metricsDetails[i].expense;
@@ -117,7 +117,7 @@ async function GetMetrics(metricId) {
 			document.getElementById("expenses-date").value = metricsDetails[i].expense_date.split('T')[0];
 			availableAgents.options[availableAgents.selectedIndex].text = metricsDetails[i].leader_name;
 			i++;
-		}
+		}	
     } catch (error) {
         showErrorModal('Error fetching agent data', error);
         return [];
@@ -249,7 +249,7 @@ async function initializeEncoder() {
 		else if (sales.value == '' || salesDate.value == '' || expense.value == '' || expenseDate.value == '') {
 			showErrorModal('Please fill in all fields');
 		} else {
-			AddAgent(_leaderId, sales.value, salesDate.value, expense.value, expenseDate.value);
+			AddAgent(availableAgents.options[availableAgents.selectedIndex].value, sales.value, salesDate.value, expense.value, expenseDate.value);
 			window.location.href = document.URL;	
 		}
     });
@@ -313,10 +313,10 @@ async function initializeEncoder() {
 	  ordering: false,
 	  info: false
 	});
-	
+
 	for(var y = 0; y <= leaders.length; y++) {
-		leaderList.add(new Option(leaders[y].leader_name, leaders[y].leader_id));
-	}
+		availableAgents.add(new Option(leaders[y].leader_name, leaders[y].leader_id));
+	}	
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -378,7 +378,6 @@ function populateDataTable(apiResponse, tableId, columns, options = {}) {
 			const thirdCellData = row.data()[2]
 
 			// Alert the row index and first cell data
-			// alert(firstCellData);
 			
 			_metricId = firstCellData;
 			_leaderId = secondCellData;
